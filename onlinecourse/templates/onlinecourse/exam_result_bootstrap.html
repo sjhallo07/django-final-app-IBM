@@ -38,17 +38,47 @@
 <div class="container-fluid">
     {% if grade > 80 %}
     <div class="alert alert-success">
-       <!--HINT Display passed info -->
+        <b>¡Felicidades, {{ user.first_name }}!</b> Has aprobado el examen y completado el curso con una puntuación de {{ grade }}/100
     </div>
         {% else %}
         <div class="alert alert-danger">
-            <!--HINT Display failed info -->
+            <b>Fallaste</b> Lo siento, {{ user.first_name }}! Has fallado el examen con una puntuación de {{ grade }}/100
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
         <div class="card-columns-vertical mt-1">
         <h5 class="">Exam results</h5>
-            <!--HINT Display exam results-->
+        
+        <!-- RECORRER PREGUNTAS -->
+        {% for question in course.question_set.all %}
+        <div class="card mt-1">
+            <div class="card-header"><h5>{{ question.content }}</h5></div>
+            <div class="form-group">
+                <!-- RECORRER OPCIONES -->
+                {% for choice in question.choice_set.all %}
+                <div class="form-check">
+                    <!-- SI LA OPCIÓN ES CORRECTA Y SELECCIONADA -->
+                    {% if choice.is_correct and choice in choices %}
+                    <div class="text-success">Correct answer: {{ choice.content }}</div>
+                    <!-- ELSE IF LA OPCIÓN ES CORRECTA Y NO SELECCIONADA -->
+                    {% else %}{% if choice.is_correct and not choice in choices %}
+                    <div class="text-warning">Not selected: {{ choice.content }}</div>
+                    <!-- ELSE IF LA OPCIÓN NO ES CORRECTA Y SELECCIONADA -->
+                    {% else %}{% if not choice.is_correct and choice in choices %}
+                    <div class="text-danger">Wrong answer: {{ choice.content }}</div>
+                    <!-- ELSE -->
+                    {% else %}
+                    <div>{{ choice.content }}</div>
+                    {% endif %}{% endif %}{% endif %}
+                    <!-- FIN DE TODOS LOS IFs -->
+                </div>
+                {% endfor %}
+                <!-- FIN DEL RECORRIDO INTERNO -->
+            </div>
+        </div>
+        {% endfor %}
+        <!-- FIN DEL RECORRIDO -->
+        
         </div>
     </div>
 </body>
